@@ -1,0 +1,1760 @@
+{
+    "name": "Track competitor pricing model",
+    "flow": [
+        {
+            "id": 2,
+            "module": "util:SetVariable2",
+            "version": 1,
+            "parameters": {},
+            "mapper": {
+                "name": "URL",
+                "scope": "roundtrip",
+                "value": "https://clickup.com/pricing"
+            },
+            "metadata": {
+                "designer": {
+                    "x": -417,
+                    "y": -78,
+                    "name": "Input URL"
+                },
+                "restore": {
+                    "expect": {
+                        "scope": {
+                            "label": "One cycle"
+                        }
+                    }
+                },
+                "expect": [
+                    {
+                        "name": "name",
+                        "type": "text",
+                        "label": "Variable name",
+                        "required": true
+                    },
+                    {
+                        "name": "scope",
+                        "type": "select",
+                        "label": "Variable lifetime",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "roundtrip",
+                                "execution"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "value",
+                        "type": "any",
+                        "label": "Variable value"
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "URL",
+                        "type": "any",
+                        "label": "URL"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 5,
+            "module": "mcp-client:DoAnAction",
+            "version": 1,
+            "parameters": {
+                "account": "YOUR_MCP_CONNECTION_ID"
+            },
+            "mapper": {
+                "tools": [
+                    "search_engine",
+                    "scrape_as_markdown",
+                    "search_engine_batch",
+                    "scrape_batch"
+                ],
+                "prompt": "From the given {{2.URL}}, extract ONLY the following plans and ignore any other plans if present:\r\n\r\n- Free\r\n- Unlimited\r\n- Business\r\n- Enterprise\r\n- Brain AI\r\n- Everything AI\r\n\r\nFor each of these plans, return ONLY these fields:\r\n\r\n{\r\n  \"name\": string,\r\n  \"price\": string,\r\n  \"features\": string[]\r\n}\r\n\r\nDo NOT include any other plans.\r\nDo NOT include any extra fields.\r\nDo NOT include any text, markdown, comments, explanations, or wrapper objects.\r\n\r\nReturn ONLY a valid JSON array in exactly this format.\r\n",
+                "disableSystemPrompt": false
+            },
+            "metadata": {
+                "designer": {
+                    "x": -74,
+                    "y": -85,
+                    "name": "Fetch competitor pricing"
+                },
+                "restore": {
+                    "parameters": {
+                        "account": {
+                            "label": "My MCP connection (mcp.brightdata.com [Token] [sse])",
+                            "data": {
+                                "scoped": "true",
+                                "connection": "mcp"
+                            }
+                        }
+                    },
+                    "expect": {
+                        "tools": {
+                            "mode": "chose",
+                            "label": [
+                                "Search engineScrape search results from Google, Bing or Yandex. Returns SERP results in JSON or Markdown (URL, title, description), Ideal for gathering current information, news, and detailed search results.",
+                                "Scrape as markdownScrape a single webpage URL with advanced options for content extraction and get back the results in MarkDown language. This tool can unlock any webpage even if it uses bot detection or CAPTCHA.",
+                                "Search engine batchRun multiple search queries simultaneously. Returns JSON for Google, Markdown for Bing/Yandex.",
+                                "Scrape batchScrape multiple webpages URLs with advanced options for content extraction and get back the results in MarkDown language. This tool can unlock any webpage even if it uses bot detection or CAPTCHA."
+                            ]
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "account",
+                        "type": "account:mcp",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "tools",
+                        "type": "select",
+                        "label": "Tools",
+                        "required": true,
+                        "multiple": true
+                    },
+                    {
+                        "name": "prompt",
+                        "type": "text",
+                        "label": "Task",
+                        "required": true
+                    },
+                    {
+                        "name": "disableSystemPrompt",
+                        "type": "boolean",
+                        "label": "Disable system prompt",
+                        "required": true
+                    }
+                ]
+            },
+            "onerror": [
+                {
+                    "id": 8,
+                    "module": "util:SetVariables",
+                    "version": 1,
+                    "parameters": {},
+                    "mapper": {
+                        "scope": "roundtrip",
+                        "variables": [
+                            {
+                                "name": "error_source",
+                                "value": "MCP"
+                            },
+                            {
+                                "name": "error_message",
+                                "value": "{{5.error.message}}"
+                            }
+                        ]
+                    },
+                    "metadata": {
+                        "designer": {
+                            "x": 279,
+                            "y": 113,
+                            "name": "MCP error info"
+                        },
+                        "restore": {
+                            "expect": {
+                                "scope": {
+                                    "label": "One cycle"
+                                },
+                                "variables": {
+                                    "items": [
+                                        null,
+                                        null
+                                    ]
+                                }
+                            }
+                        },
+                        "expect": [
+                            {
+                                "name": "variables",
+                                "spec": [
+                                    {
+                                        "name": "name",
+                                        "type": "text",
+                                        "label": "Variable name",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "value",
+                                        "type": "any",
+                                        "label": "Variable value"
+                                    }
+                                ],
+                                "type": "array",
+                                "label": "Variables"
+                            },
+                            {
+                                "name": "scope",
+                                "type": "select",
+                                "label": "Variable lifetime",
+                                "required": true,
+                                "validate": {
+                                    "enum": [
+                                        "roundtrip",
+                                        "execution"
+                                    ]
+                                }
+                            }
+                        ],
+                        "interface": [
+                            {
+                                "name": "error_source",
+                                "type": "any",
+                                "label": "error_source"
+                            },
+                            {
+                                "name": "error_message",
+                                "type": "any",
+                                "label": "error_message"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": 9,
+            "module": "json:ParseJSON",
+            "version": 1,
+            "parameters": {
+                "type": 274159
+            },
+            "mapper": {
+                "json": "{{5.result}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 275,
+                    "y": -229,
+                    "name": "convert mcp result into JSON"
+                },
+                "restore": {
+                    "parameters": {
+                        "type": {
+                            "label": "My data structure"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "type",
+                        "type": "udt",
+                        "label": "Data structure"
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "json",
+                        "type": "text",
+                        "label": "JSON string",
+                        "required": true
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "type",
+                        "label": "Type",
+                        "help": "",
+                        "type": "text",
+                        "default": null,
+                        "required": false,
+                        "multiline": false
+                    },
+                    {
+                        "name": "items",
+                        "label": "Items",
+                        "help": "",
+                        "type": "collection",
+                        "spec": [
+                            {
+                                "name": "type",
+                                "label": "Type",
+                                "help": "",
+                                "type": "text",
+                                "default": null,
+                                "required": false,
+                                "multiline": false
+                            },
+                            {
+                                "name": "required",
+                                "label": "Required",
+                                "help": "",
+                                "type": "array",
+                                "spec": {
+                                    "type": "text",
+                                    "default": null,
+                                    "required": false,
+                                    "multiline": false
+                                },
+                                "required": false
+                            },
+                            {
+                                "name": "properties",
+                                "label": "Properties",
+                                "help": "",
+                                "type": "collection",
+                                "spec": [
+                                    {
+                                        "name": "name",
+                                        "label": "Name",
+                                        "help": "",
+                                        "type": "collection",
+                                        "spec": [
+                                            {
+                                                "name": "type",
+                                                "label": "Type",
+                                                "help": "",
+                                                "type": "text",
+                                                "default": null,
+                                                "required": false,
+                                                "multiline": false
+                                            }
+                                        ],
+                                        "required": false
+                                    },
+                                    {
+                                        "name": "price",
+                                        "label": "Price",
+                                        "help": "",
+                                        "type": "collection",
+                                        "spec": [
+                                            {
+                                                "name": "type",
+                                                "label": "Type",
+                                                "help": "",
+                                                "type": "text",
+                                                "default": null,
+                                                "required": false,
+                                                "multiline": false
+                                            }
+                                        ],
+                                        "required": false
+                                    },
+                                    {
+                                        "name": "features",
+                                        "label": "Features",
+                                        "help": "",
+                                        "type": "collection",
+                                        "spec": [
+                                            {
+                                                "name": "type",
+                                                "label": "Type",
+                                                "help": "",
+                                                "type": "text",
+                                                "default": null,
+                                                "required": false,
+                                                "multiline": false
+                                            },
+                                            {
+                                                "name": "items",
+                                                "label": "Items",
+                                                "help": "",
+                                                "type": "collection",
+                                                "spec": [
+                                                    {
+                                                        "name": "type",
+                                                        "label": "Type",
+                                                        "help": "",
+                                                        "type": "text",
+                                                        "default": null,
+                                                        "required": false,
+                                                        "multiline": false
+                                                    }
+                                                ],
+                                                "required": false
+                                            }
+                                        ],
+                                        "required": false
+                                    }
+                                ],
+                                "required": false
+                            }
+                        ],
+                        "required": false
+                    }
+                ]
+            },
+            "onerror": [
+                {
+                    "id": 10,
+                    "module": "util:SetVariables",
+                    "version": 1,
+                    "parameters": {},
+                    "mapper": {
+                        "scope": "roundtrip",
+                        "variables": [
+                            {
+                                "name": "error_source",
+                                "value": "Parse JSON"
+                            },
+                            {
+                                "name": "error_message",
+                                "value": "{{9.error.message}}"
+                            }
+                        ]
+                    },
+                    "metadata": {
+                        "designer": {
+                            "x": 600,
+                            "y": -4,
+                            "name": "Invalid JSON error info"
+                        },
+                        "restore": {
+                            "expect": {
+                                "scope": {
+                                    "label": "One cycle"
+                                },
+                                "variables": {
+                                    "items": [
+                                        null,
+                                        null
+                                    ]
+                                }
+                            }
+                        },
+                        "expect": [
+                            {
+                                "name": "variables",
+                                "spec": [
+                                    {
+                                        "name": "name",
+                                        "type": "text",
+                                        "label": "Variable name",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "value",
+                                        "type": "any",
+                                        "label": "Variable value"
+                                    }
+                                ],
+                                "type": "array",
+                                "label": "Variables"
+                            },
+                            {
+                                "name": "scope",
+                                "type": "select",
+                                "label": "Variable lifetime",
+                                "required": true,
+                                "validate": {
+                                    "enum": [
+                                        "roundtrip",
+                                        "execution"
+                                    ]
+                                }
+                            }
+                        ],
+                        "interface": [
+                            {
+                                "name": "error_source",
+                                "type": "any",
+                                "label": "error_source"
+                            },
+                            {
+                                "name": "error_message",
+                                "type": "any",
+                                "label": "error_message"
+                            }
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "module": "google-sheets:filterRows",
+            "version": 2,
+            "parameters": {
+                "__IMTCONN__": "YOUR_GOOGLE_CONNECTION_ID"
+            },
+            "mapper": {
+                "from": "drive",
+                "valueRenderOption": "FORMATTED_VALUE",
+                "dateTimeRenderOption": "FORMATTED_STRING",
+                "spreadsheetId": "YOUR_SPREADSHEET_ID",
+                "sheetId": "Sheet1",
+                "includesHeaders": true,
+                "tableFirstRow": "A1:CZ1",
+                "filter": [
+                    [
+                        {
+                            "a": "A",
+                            "o": "text:equal",
+                            "b": "{{9.name}}"
+                        }
+                    ]
+                ],
+                "sortOrder": "asc"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 636,
+                    "y": -394,
+                    "name": "Read rows of old pricing"
+                },
+                "restore": {
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "label": "My Google connection (your-email@example.com)",
+                            "data": {
+                                "scoped": "true",
+                                "connection": "google"
+                            }
+                        }
+                    },
+                    "expect": {
+                        "from": {
+                            "label": "Select from My Drive"
+                        },
+                        "valueRenderOption": {
+                            "mode": "chose",
+                            "label": "Formatted value"
+                        },
+                        "dateTimeRenderOption": {
+                            "mode": "chose",
+                            "label": "Formatted string"
+                        },
+                        "spreadsheetId": {
+                            "mode": "chose",
+                            "label": "Competitor Pricing Tracker"
+                        },
+                        "sheetId": {
+                            "mode": "chose",
+                            "label": "Sheet1"
+                        },
+                        "includesHeaders": {
+                            "mode": "chose",
+                            "label": "Yes"
+                        },
+                        "tableFirstRow": {
+                            "label": "A-CZ"
+                        },
+                        "orderBy": {
+                            "mode": "chose"
+                        },
+                        "sortOrder": {
+                            "mode": "chose",
+                            "label": "Ascending"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:google",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "from",
+                        "type": "select",
+                        "label": "Search Method",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "drive",
+                                "share"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "valueRenderOption",
+                        "type": "select",
+                        "label": "Value render option",
+                        "validate": {
+                            "enum": [
+                                "FORMATTED_VALUE",
+                                "UNFORMATTED_VALUE",
+                                "FORMULA"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "dateTimeRenderOption",
+                        "type": "select",
+                        "label": "Date and time render option",
+                        "validate": {
+                            "enum": [
+                                "SERIAL_NUMBER",
+                                "FORMATTED_STRING"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "type": "uinteger",
+                        "label": "Limit"
+                    },
+                    {
+                        "name": "spreadsheetId",
+                        "type": "select",
+                        "label": "Spreadsheet ID",
+                        "required": true
+                    },
+                    {
+                        "name": "sheetId",
+                        "type": "select",
+                        "label": "Sheet Name",
+                        "required": true
+                    },
+                    {
+                        "name": "includesHeaders",
+                        "type": "select",
+                        "label": "Table contains headers",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                true,
+                                false
+                            ]
+                        }
+                    },
+                    {
+                        "name": "tableFirstRow",
+                        "type": "select",
+                        "label": "Column range",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "A1:Z1",
+                                "A1:BZ1",
+                                "A1:CZ1",
+                                "A1:DZ1",
+                                "A1:MZ1",
+                                "A1:ZZ1",
+                                "A1:AZZ1",
+                                "A1:BZZ1",
+                                "A1:CZZ1",
+                                "A1:DZZ1",
+                                "A1:MZZ1",
+                                "A1:ZZZ1"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "filter",
+                        "type": "filter",
+                        "label": "Filter",
+                        "options": "rpc://google-sheets/2/rpcGetFilterKeys?includesHeaders=true"
+                    },
+                    {
+                        "name": "orderBy",
+                        "type": "select",
+                        "label": "Order by"
+                    },
+                    {
+                        "name": "sortOrder",
+                        "type": "select",
+                        "label": "Sort order",
+                        "validate": {
+                            "enum": [
+                                "asc",
+                                "desc"
+                            ]
+                        }
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "__IMTLENGTH__",
+                        "label": "Total number of bundles",
+                        "type": "uinteger"
+                    },
+                    {
+                        "name": "__IMTINDEX__",
+                        "label": "Bundle order position",
+                        "type": "uinteger"
+                    },
+                    {
+                        "name": "__ROW_NUMBER__",
+                        "label": "Row number",
+                        "type": "number"
+                    },
+                    {
+                        "name": "__SPREADSHEET_ID__",
+                        "label": "Spreadsheet ID",
+                        "type": "text"
+                    },
+                    {
+                        "name": "__SHEET__",
+                        "label": "Sheet",
+                        "type": "text"
+                    },
+                    {
+                        "name": "0",
+                        "label": "Plan (A)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "1",
+                        "label": "Price (B)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "2",
+                        "label": "Key features (C)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "3",
+                        "label": "(D)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "4",
+                        "label": "(E)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "5",
+                        "label": "(F)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "6",
+                        "label": "(G)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "7",
+                        "label": "(H)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "8",
+                        "label": "(I)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "9",
+                        "label": "(J)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "10",
+                        "label": "(K)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "11",
+                        "label": "(L)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "12",
+                        "label": "(M)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "13",
+                        "label": "(N)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "14",
+                        "label": "(O)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "15",
+                        "label": "(P)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "16",
+                        "label": "(Q)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "17",
+                        "label": "(R)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "18",
+                        "label": "(S)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "19",
+                        "label": "(T)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "20",
+                        "label": "(U)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "21",
+                        "label": "(V)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "22",
+                        "label": "(W)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "23",
+                        "label": "(X)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "24",
+                        "label": "(Y)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "25",
+                        "label": "(Z)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "26",
+                        "label": "(AA)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "27",
+                        "label": "(AB)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "28",
+                        "label": "(AC)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "29",
+                        "label": "(AD)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "30",
+                        "label": "(AE)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "31",
+                        "label": "(AF)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "32",
+                        "label": "(AG)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "33",
+                        "label": "(AH)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "34",
+                        "label": "(AI)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "35",
+                        "label": "(AJ)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "36",
+                        "label": "(AK)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "37",
+                        "label": "(AL)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "38",
+                        "label": "(AM)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "39",
+                        "label": "(AN)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "40",
+                        "label": "(AO)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "41",
+                        "label": "(AP)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "42",
+                        "label": "(AQ)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "43",
+                        "label": "(AR)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "44",
+                        "label": "(AS)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "45",
+                        "label": "(AT)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "46",
+                        "label": "(AU)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "47",
+                        "label": "(AV)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "48",
+                        "label": "(AW)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "49",
+                        "label": "(AX)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "50",
+                        "label": "(AY)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "51",
+                        "label": "(AZ)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "52",
+                        "label": "(BA)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "53",
+                        "label": "(BB)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "54",
+                        "label": "(BC)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "55",
+                        "label": "(BD)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "56",
+                        "label": "(BE)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "57",
+                        "label": "(BF)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "58",
+                        "label": "(BG)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "59",
+                        "label": "(BH)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "60",
+                        "label": "(BI)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "61",
+                        "label": "(BJ)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "62",
+                        "label": "(BK)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "63",
+                        "label": "(BL)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "64",
+                        "label": "(BM)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "65",
+                        "label": "(BN)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "66",
+                        "label": "(BO)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "67",
+                        "label": "(BP)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "68",
+                        "label": "(BQ)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "69",
+                        "label": "(BR)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "70",
+                        "label": "(BS)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "71",
+                        "label": "(BT)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "72",
+                        "label": "(BU)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "73",
+                        "label": "(BV)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "74",
+                        "label": "(BW)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "75",
+                        "label": "(BX)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "76",
+                        "label": "(BY)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "77",
+                        "label": "(BZ)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "78",
+                        "label": "(CA)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "79",
+                        "label": "(CB)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "80",
+                        "label": "(CC)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "81",
+                        "label": "(CD)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "82",
+                        "label": "(CE)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "83",
+                        "label": "(CF)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "84",
+                        "label": "(CG)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "85",
+                        "label": "(CH)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "86",
+                        "label": "(CI)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "87",
+                        "label": "(CJ)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "88",
+                        "label": "(CK)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "89",
+                        "label": "(CL)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "90",
+                        "label": "(CM)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "91",
+                        "label": "(CN)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "92",
+                        "label": "(CO)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "93",
+                        "label": "(CP)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "94",
+                        "label": "(CQ)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "95",
+                        "label": "(CR)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "96",
+                        "label": "(CS)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "97",
+                        "label": "(CT)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "98",
+                        "label": "(CU)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "99",
+                        "label": "(CV)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "100",
+                        "label": "(CW)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "101",
+                        "label": "(CX)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "102",
+                        "label": "(CY)",
+                        "type": "text"
+                    },
+                    {
+                        "name": "103",
+                        "label": "(CZ)",
+                        "type": "text"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 22,
+            "module": "builtin:BasicRouter",
+            "version": 1,
+            "parameters": {
+                "else": 1
+            },
+            "mapper": null,
+            "metadata": {
+                "designer": {
+                    "x": 965,
+                    "y": -396,
+                    "name": "compare old price vs new price"
+                }
+            },
+            "routes": [
+                {
+                    "flow": [
+                        {
+                            "id": 24,
+                            "module": "google-sheets:updateRow",
+                            "version": 2,
+                            "parameters": {
+                                "__IMTCONN__": "YOUR_GOOGLE_CONNECTION_ID"
+                            },
+                            "filter": {
+                                "name": "",
+                                "conditions": [
+                                    [
+                                        {
+                                            "a": "{{4.`1`}}",
+                                            "o": "text:notequal",
+                                            "b": "{{9.price}}"
+                                        }
+                                    ]
+                                ]
+                            },
+                            "mapper": {
+                                "mode": "select",
+                                "valueInputOption": "USER_ENTERED",
+                                "from": "drive",
+                                "spreadsheetId": "YOUR_SPREADSHEET_ID",
+                                "sheetId": "Sheet1",
+                                "rowNumber": "{{4.`__ROW_NUMBER__`}}",
+                                "includesHeaders": true,
+                                "values": {
+                                    "0": "{{4.`0`}}",
+                                    "1": "{{9.price}}",
+                                    "2": "{{4.`2`}}"
+                                }
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 1284,
+                                    "y": -544,
+                                    "name": "update price "
+                                },
+                                "restore": {
+                                    "parameters": {
+                                        "__IMTCONN__": {
+                                            "label": "My Google connection (your-email@example.com)",
+                                            "data": {
+                                                "scoped": "true",
+                                                "connection": "google"
+                                            }
+                                        }
+                                    },
+                                    "expect": {
+                                        "mode": {
+                                            "label": "Search by path"
+                                        },
+                                        "valueInputOption": {
+                                            "mode": "chose",
+                                            "label": "User entered"
+                                        },
+                                        "from": {
+                                            "label": "My Drive"
+                                        },
+                                        "spreadsheetId": {
+                                            "path": [
+                                                "make mcp ",
+                                                "Competitor Pricing Tracker"
+                                            ]
+                                        },
+                                        "sheetId": {
+                                            "label": "Sheet1"
+                                        },
+                                        "includesHeaders": {
+                                            "nested": [
+                                                {
+                                                    "name": "values",
+                                                    "label": "Values",
+                                                    "type": "collection",
+                                                    "spec": [
+                                                        {
+                                                            "name": "0",
+                                                            "label": "Plan (A)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "1",
+                                                            "label": "Price (B)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "2",
+                                                            "label": "Key features (C)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "3",
+                                                            "label": "(D)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "4",
+                                                            "label": "(E)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "5",
+                                                            "label": "(F)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "6",
+                                                            "label": "(G)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "7",
+                                                            "label": "(H)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "8",
+                                                            "label": "(I)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "9",
+                                                            "label": "(J)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "10",
+                                                            "label": "(K)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "11",
+                                                            "label": "(L)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "12",
+                                                            "label": "(M)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "13",
+                                                            "label": "(N)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "14",
+                                                            "label": "(O)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "15",
+                                                            "label": "(P)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "16",
+                                                            "label": "(Q)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "17",
+                                                            "label": "(R)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "18",
+                                                            "label": "(S)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "19",
+                                                            "label": "(T)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "20",
+                                                            "label": "(U)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "21",
+                                                            "label": "(V)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "22",
+                                                            "label": "(W)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "23",
+                                                            "label": "(X)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "24",
+                                                            "label": "(Y)",
+                                                            "type": "text"
+                                                        },
+                                                        {
+                                                            "name": "25",
+                                                            "label": "(Z)",
+                                                            "type": "text"
+                                                        }
+                                                    ]
+                                                }
+                                            ],
+                                            "label": "Yes"
+                                        }
+                                    }
+                                },
+                                "parameters": [
+                                    {
+                                        "name": "__IMTCONN__",
+                                        "type": "account:google",
+                                        "label": "Connection",
+                                        "required": true
+                                    }
+                                ],
+                                "expect": [
+                                    {
+                                        "name": "mode",
+                                        "type": "select",
+                                        "label": "Search Method",
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "select",
+                                                "fromAll",
+                                                "map"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "valueInputOption",
+                                        "type": "select",
+                                        "label": "Value input option",
+                                        "validate": {
+                                            "enum": [
+                                                "USER_ENTERED",
+                                                "RAW"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "from",
+                                        "type": "select",
+                                        "label": "Drive",
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "drive",
+                                                "share",
+                                                "team"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "spreadsheetId",
+                                        "type": "file",
+                                        "label": "Spreadsheet ID",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "sheetId",
+                                        "type": "select",
+                                        "label": "Sheet Name",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "rowNumber",
+                                        "type": "uinteger",
+                                        "label": "Row number",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "includesHeaders",
+                                        "type": "select",
+                                        "label": "Table contains headers",
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                true,
+                                                false
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "values",
+                                        "type": "collection",
+                                        "label": "Values",
+                                        "spec": [
+                                            {
+                                                "name": "0",
+                                                "type": "text",
+                                                "label": "Plan (A)"
+                                            },
+                                            {
+                                                "name": "1",
+                                                "type": "text",
+                                                "label": "Price (B)"
+                                            },
+                                            {
+                                                "name": "2",
+                                                "type": "text",
+                                                "label": "Key features (C)"
+                                            },
+                                            {
+                                                "name": "3",
+                                                "type": "text",
+                                                "label": "(D)"
+                                            },
+                                            {
+                                                "name": "4",
+                                                "type": "text",
+                                                "label": "(E)"
+                                            },
+                                            {
+                                                "name": "5",
+                                                "type": "text",
+                                                "label": "(F)"
+                                            },
+                                            {
+                                                "name": "6",
+                                                "type": "text",
+                                                "label": "(G)"
+                                            },
+                                            {
+                                                "name": "7",
+                                                "type": "text",
+                                                "label": "(H)"
+                                            },
+                                            {
+                                                "name": "8",
+                                                "type": "text",
+                                                "label": "(I)"
+                                            },
+                                            {
+                                                "name": "9",
+                                                "type": "text",
+                                                "label": "(J)"
+                                            },
+                                            {
+                                                "name": "10",
+                                                "type": "text",
+                                                "label": "(K)"
+                                            },
+                                            {
+                                                "name": "11",
+                                                "type": "text",
+                                                "label": "(L)"
+                                            },
+                                            {
+                                                "name": "12",
+                                                "type": "text",
+                                                "label": "(M)"
+                                            },
+                                            {
+                                                "name": "13",
+                                                "type": "text",
+                                                "label": "(N)"
+                                            },
+                                            {
+                                                "name": "14",
+                                                "type": "text",
+                                                "label": "(O)"
+                                            },
+                                            {
+                                                "name": "15",
+                                                "type": "text",
+                                                "label": "(P)"
+                                            },
+                                            {
+                                                "name": "16",
+                                                "type": "text",
+                                                "label": "(Q)"
+                                            },
+                                            {
+                                                "name": "17",
+                                                "type": "text",
+                                                "label": "(R)"
+                                            },
+                                            {
+                                                "name": "18",
+                                                "type": "text",
+                                                "label": "(S)"
+                                            },
+                                            {
+                                                "name": "19",
+                                                "type": "text",
+                                                "label": "(T)"
+                                            },
+                                            {
+                                                "name": "20",
+                                                "type": "text",
+                                                "label": "(U)"
+                                            },
+                                            {
+                                                "name": "21",
+                                                "type": "text",
+                                                "label": "(V)"
+                                            },
+                                            {
+                                                "name": "22",
+                                                "type": "text",
+                                                "label": "(W)"
+                                            },
+                                            {
+                                                "name": "23",
+                                                "type": "text",
+                                                "label": "(X)"
+                                            },
+                                            {
+                                                "name": "24",
+                                                "type": "text",
+                                                "label": "(Y)"
+                                            },
+                                            {
+                                                "name": "25",
+                                                "type": "text",
+                                                "label": "(Z)"
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                },
+                {
+                    "flow": [
+                        {
+                            "id": 23,
+                            "module": "util:SetVariable2",
+                            "version": 1,
+                            "parameters": {},
+                            "mapper": {
+                                "name": "Price",
+                                "scope": "roundtrip",
+                                "value": "Not changed"
+                            },
+                            "metadata": {
+                                "designer": {
+                                    "x": 1279,
+                                    "y": -240,
+                                    "name": "price not changed"
+                                },
+                                "restore": {
+                                    "expect": {
+                                        "scope": {
+                                            "label": "One cycle"
+                                        }
+                                    }
+                                },
+                                "expect": [
+                                    {
+                                        "name": "name",
+                                        "type": "text",
+                                        "label": "Variable name",
+                                        "required": true
+                                    },
+                                    {
+                                        "name": "scope",
+                                        "type": "select",
+                                        "label": "Variable lifetime",
+                                        "required": true,
+                                        "validate": {
+                                            "enum": [
+                                                "roundtrip",
+                                                "execution"
+                                            ]
+                                        }
+                                    },
+                                    {
+                                        "name": "value",
+                                        "type": "any",
+                                        "label": "Variable value"
+                                    }
+                                ],
+                                "interface": [
+                                    {
+                                        "name": "Price",
+                                        "label": "Price",
+                                        "type": "any"
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            ]
+        }
+    ],
+    "metadata": {
+        "instant": false,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "autoCommitTriggerLast": true,
+            "sequential": false,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false,
+            "freshVariables": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "us2.make.com",
+        "notes": [
+            {
+                "moduleIds": [
+                    5
+                ],
+                "content": "<p><strong>Workflow Description \u2013 Competitor Pricing Tracker</strong></p><p></p><p>This workflow automatically monitors a competitor\u2019s pricing page, extracts the latest pricing information, compares it with the existing records in Google Sheets, and updates only the rows where a price change is detected.</p><p></p><p><strong>Process Overview</strong></p><ol><li><strong>Input URL</strong></li><li>The competitor\u2019s pricing page URL is provided as the input for the workflow.</li><li><strong>Fetch Competitor Pricing (MCP Client)</strong></li><li>The workflow retrieves the latest pricing data from the competitor\u2019s website, including plan name, price, and key features.</li><li><strong>Convert Result to Structured JSON</strong></li><li>The extracted data is converted into a structured JSON format for reliable downstream processing.</li><li><strong>Read Existing Prices from Google Sheets</strong></li><li>The workflow reads the current (previously stored) pricing data from the Google Sheet.</li><li><strong>Compare Old Price vs. New Price</strong></li><li>For each plan, the workflow compares the price stored in Google Sheets with the newly fetched price from the competitor\u2019s website.</li><li><strong>Update Changed Prices Only</strong></li><li>If a price difference is detected, the workflow updates only the corresponding row in Google Sheets with the new price.</li><li><strong>No-Change Handling (Fallback Route)</strong></li><li>If the price has not changed, the workflow skips the update and continues without modifying the sheet.</li></ol><p></p><p><strong>Outcome</strong></p><p>This automation keeps the Google Sheet continuously synchronized with the competitor\u2019s latest pricing information while ensuring that only rows with actual price changes are updated.</p>",
+                "isFilterNote": false,
+                "metadata": {
+                    "color": "#9138FE"
+                }
+            }
+        ]
+    }
+}
