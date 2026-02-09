@@ -56,4 +56,4 @@ Then update the spreadsheet ID in **both** Google Sheets modules (Read and Updat
 
 | Version | Date       | Changes         |
 | ------- | ---------- | --------------- |
-| 1.0.0   | 2025-02-09 | Initial release |
+| 1.0.0   | 2026-02-09 | Initial release |

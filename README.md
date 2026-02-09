@@ -12,7 +12,7 @@ A Make.com automation that monitors competitor pricing pages using Bright Data M
 - Extracts structured plan data: name, price, and key features
 - Reads existing pricing records from Google Sheets for comparison
 - Detects price changes by comparing old vs. new prices per plan
-- Updates only the rows where the price has actually changed
+- Updates only the rows where the price has actually changed (features column is preserved, not overwritten)
 - Skips plans with unchanged prices to minimize unnecessary writes
 
 ## How It Works

@@ -52,6 +52,9 @@ Bright Data MCP is a free AI-powered web scraping tool that connects directly to
    - Create a blank sheet with headers: `Plan`, `Price`, `Key features`
 5. **Pre-populate the sheet** with the plans you want to track (see example in the CSV template)
 6. Update the **Spreadsheet ID** in both Google Sheets modules to point to your new sheet
+7. Ensure the sheet name is **Sheet1** (or update both modules to match your sheet name)
+
+> **How to find your Spreadsheet ID**: Open your Google Sheet in a browser. The URL looks like `https://docs.google.com/spreadsheets/d/YOUR_SPREADSHEET_ID/edit`. Copy the long string between `/d/` and `/edit`.
 
 ## 4. Configure Input Variables
 
@@ -60,6 +63,10 @@ Click the **Input URL** module and update:
 | Variable | What to Set                                                        |
 | -------- | ------------------------------------------------------------------ |
 | `URL`    | Your competitor's pricing page, e.g. `https://clickup.com/pricing` |
+
+### Important: What Gets Updated
+
+The automation only updates the **Price** column when a change is detected. The **Key Features** column is preserved from your existing sheet data and is not overwritten by the MCP scrape. To update features, edit the sheet manually or modify the blueprint's update module.
 
 ### Customizing Tracked Plans
 
@@ -75,11 +82,12 @@ The MCP prompt is configured to extract specific plan names. To track different 
 
 ## 6. Troubleshooting
 
-| Issue                      | Solution                                                                     |
-| -------------------------- | ---------------------------------------------------------------------------- |
-| MCP connection fails       | Verify your Bright Data token is correct and hasn't expired                  |
-| No plans extracted         | The MCP prompt specifies exact plan names. Verify they match the target page |
-| All rows say "Not changed" | This is correct if prices haven't changed since last run                     |
-| Invalid JSON errors        | The MCP response format may vary. Check the error handler output             |
-| Google Sheets not updating | Verify the spreadsheet ID in BOTH Sheets modules (read and update)           |
-| Wrong row updated          | The filter matches on Plan name (column A). Ensure plan names are exact      |
+| Issue                      | Solution                                                                           |
+| -------------------------- | ---------------------------------------------------------------------------------- |
+| MCP connection fails       | Verify your Bright Data token is correct and hasn't expired                        |
+| No plans extracted         | The MCP prompt specifies exact plan names. Verify they match the target page       |
+| All rows say "Not changed" | This is correct if prices haven't changed since last run                           |
+| Invalid JSON errors        | The MCP response format may vary. Check the error handler output                   |
+| Google Sheets not updating | Verify the spreadsheet ID in BOTH Sheets modules (read and update)                 |
+| Can't find error details   | Click the error handler module (pink) after a failed run to see captured variables |
+| Wrong row updated          | The filter matches on Plan name (column A). Ensure plan names are exact            |
